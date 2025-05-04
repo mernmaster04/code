@@ -1,0 +1,78 @@
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class BerkeleyAlgorithm {
+
+    static class Node {
+        long clockTime; // Time in milliseconds
+
+        public Node(long time) {
+            this.clockTime = time;
+        }
+
+        public long getTime() {
+            return clockTime;
+        }
+
+        public void setTime(long newTime) {
+            this.clockTime = newTime;
+        }
+
+        public String getFormattedTime() {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
+            return sdf.format(new Date(clockTime));
+        }
+    }
+
+    public static void main(String[] args) {
+        // Simulate current time
+        long baseTime = System.currentTimeMillis();
+
+        // Create nodes with some simulated drift
+        Node master = new Node(baseTime);
+        Node[] slaves = {
+                new Node(baseTime - 200), // 1 min behind
+                new Node(baseTime + 100), // 1.5 min ahead
+                new Node(baseTime - 300) // 2 min behind
+        };
+
+        // Display initial times
+        System.out.println("Initial Times:");
+        System.out.println("Master: " + master.getFormattedTime());
+        for (int i = 0; i < slaves.length; i++) {
+            System.out.println("Slave " + (i + 1) + ": " + slaves[i].getFormattedTime() +
+                    " (Diff: " + (slaves[i].getTime() - master.getTime()) + " ms)");
+        }
+
+        // Step 1: Master polls slaves and collects their times
+        long[] slaveTimes = new long[slaves.length];
+        for (int i = 0; i < slaves.length; i++) {
+            slaveTimes[i] = slaves[i].getTime();
+        }
+
+        // Step 2: Master calculates offset from its time for each slave
+        long sumOffsets = 0;
+        for (long time : slaveTimes) {
+            sumOffsets += (time - master.getTime());
+        }
+
+        // Average offset including master
+        long avgOffset = sumOffsets / (slaves.length + 1);
+        System.out.println("\nCalculated Average Offset: " + avgOffset + " ms");
+
+        // Step 3: Compute synchronized time and apply it to all nodes
+        long synchronizedTime = master.getTime() + avgOffset;
+        master.setTime(synchronizedTime);
+        for (Node slave : slaves) {
+            slave.setTime(synchronizedTime);
+        }
+
+        // Display synchronized times
+        System.out.println("\nSynchronized Times:");
+        System.out.println("Master: " + master.getFormattedTime());
+        for (int i = 0; i < slaves.length; i++) {
+            System.out.println("Slave " + (i + 1) + ": " + slaves[i].getFormattedTime() +
+                    " (Now aligned)");
+        }
+    }
+}

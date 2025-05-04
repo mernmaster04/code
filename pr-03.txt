@@ -1,0 +1,78 @@
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define n 10
+
+int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+int main(int argc, char *argv[])
+{
+    int pid, np, element_per_process, n_element_received;
+    MPI_Status status;
+    MPI_Init(&argc, &argv);
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+    MPI_Comm_size(MPI_COMM_WORLD, &np);
+
+    if (pid == 0)
+    {
+        int index, i;
+        element_per_process = n / np;
+
+        // Distribute data to other processes
+        if (np > 1)
+        {
+            for (i = 1; i < np; i++)
+            {
+                index = i * element_per_process;
+
+                // For the last process, send remaining elements
+                int elements_to_send = (i == np - 1) ? (n - index) : element_per_process;
+
+                MPI_Send(&elements_to_send, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+                MPI_Send(&a[index], elements_to_send, MPI_INT, i, 0, MPI_COMM_WORLD);
+            }
+        }
+
+        // Compute sum for this process (pid 0)
+        int sum = 0;
+        for (i = 0; i < element_per_process; i++)
+        {
+            sum += a[i];
+        }
+
+        // Collect sums from other processes
+        int temp;
+        for (i = 1; i < np; i++)
+        {
+            MPI_Recv(&temp, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &status);
+            sum += temp;
+        }
+
+        printf("Sum of array is %d\n", sum);
+    }
+    else
+    {
+        int received_data[100]; // Make sure this is big enough
+        int sum = 0;
+
+        // Receive number of elements
+        MPI_Recv(&n_element_received, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+
+        // Receive actual data
+        MPI_Recv(&received_data, n_element_received, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+
+        // Compute local sum
+        for (int i = 0; i < n_element_received; i++)
+        {
+            sum += received_data[i];
+        }
+
+        // Send local sum back to root process
+        MPI_Send(&sum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    }
+
+    MPI_Finalize();
+    return 0;
+}
