@@ -85,5 +85,61 @@ public class BerkeleyAlgorithm {   // This is the main class that contains the B
 
 /*
 1. Offset is the difference in time between a slave node’s clock and the master’s clock. (e.g 200ms)
+Objective:
+To implement the Berkeley Algorithm to synchronize clocks in a distributed system
 
+What is the Berkeley Algorithm?
+The Berkeley Algorithm is a decentralized clock synchronization technique used in distributed systems. It assumes that no machine has an accurate clock, and instead computes an average of all available clocks to synchronize all nodes.
+
+🧩 Working Steps of Berkeley Algorithm:
+1. One node is elected as the Master.
+2. The master polls all other nodes (slaves) to get their local times.
+3. The master receives all clock times and computes the average (excluding any faulty values if needed).
+4. It calculates offset for each node (difference between average time and that node's time).
+5. It sends the offset to each node, which then adjusts its clock accordingly.
+
+Diagram (Optional):
+        Master Node
+             |
+  -------------------------
+  |           |           |
+Slave 1    Slave 2     Slave 3
+
+Step 1: Master polls time from each slave
+Step 2: Master computes average
+Step 3: Sends offset to each node
+Step 4: Each node adjusts its time
+
+
+This way, all clocks are aligned to the average global time.
+Tools and Programming Language Used:
+Tool / Environment	            Description
+Programming Language	       Java (JDK 8 or above)
+IDE (Optional)	            Eclipse / IntelliJ / NetBeans
+OS	                        Windows / Linux / macOS
+Compiler	                javac (Java compiler)
+
+
+code
+Result:
+The Java program successfully implements the Berkeley Algorithm. It synchronizes the clocks of all nodes (master and slaves) to a common average time by computing and applying clock offsets.
+
+Conclusion:
+Using Java, we implemented the Berkeley Algorithm to synchronize multiple system clocks by calculating a global average time and adjusting each node's clock with an offset.
+
+
+Q: What is clock drift?
+A: Clock drift is the gradual difference in time between clocks due to hardware variations.
+
+Q: Why is synchronization important in distributed systems?
+A: To maintain consistency in operations like logging, authentication, and scheduling.
+
+Q: What role does the master node play in the Berkeley Algorithm?
+A: It collects time from all slaves, computes the average, and sends offset instructions.
+
+Q: How is Berkeley Algorithm different from Cristian’s Algorithm?
+A: Cristian’s uses a time server; Berkeley computes time by averaging all node clocks.
+
+Q: Can this algorithm tolerate faulty nodes?
+A: Yes, faulty nodes can be detected and excluded from the average calculation.
 */
