@@ -1,39 +1,42 @@
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.text.SimpleDateFormat;  // SimpleDateFormat is used to convert date/time in milliseconds into a human-readable format like
+import java.util.*;          //  imports all utility classes like Date, which is used here.
 
-public class BerkeleyAlgorithm {
+public class BerkeleyAlgorithm {   // This is the main class that contains the Berkeley clock synchronization algorithm.
 
+// Defines a Node (either master or slave), which has a clock time in milliseconds.
     static class Node {
         long clockTime; // Time in milliseconds
 
-        public Node(long time) {
+        public Node(long time) {   // (constructor) Initializes the node's clock with a given time. 
             this.clockTime = time;
         }
 
-        public long getTime() {
+        public long getTime() {   // Returns the node's current clock time. 
             return clockTime;
         }
 
-        public void setTime(long newTime) {
+        public void setTime(long newTime) {  // Sets (updates) the node's clock time.
             this.clockTime = newTime;
         }
 
-        public String getFormattedTime() {
+    // Converts the time (in milliseconds) into a human-readable format like "14:25:30:123".
+        public String getFormattedTime() {   
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
             return sdf.format(new Date(clockTime));
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) {   // This is the entry point of the program.
         // Simulate current time
-        long baseTime = System.currentTimeMillis();
+        long baseTime = System.currentTimeMillis();  // Gets the current time in milliseconds from the system clock
 
         // Create nodes with some simulated drift
-        Node master = new Node(baseTime);
-        Node[] slaves = {
-                new Node(baseTime - 200), // 1 min behind
-                new Node(baseTime + 100), // 1.5 min ahead
-                new Node(baseTime - 300) // 2 min behind
+        Node master = new Node(baseTime); // Creates the master node with the current time.
+
+        Node[] slaves = {   // Creates 3 slave nodes with time drift:
+                new Node(baseTime - 200), // 200 ms behind from current time
+                new Node(baseTime + 100), // 100 ms min ahead
+                new Node(baseTime - 300) // 300 ms behind
         };
 
         // Display initial times
@@ -45,12 +48,14 @@ public class BerkeleyAlgorithm {
         }
 
         // Step 1: Master polls slaves and collects their times
+        // Master collects the times of all slave nodes and stores them in an array.
         long[] slaveTimes = new long[slaves.length];
         for (int i = 0; i < slaves.length; i++) {
             slaveTimes[i] = slaves[i].getTime();
         }
 
         // Step 2: Master calculates offset from its time for each slave
+        // Calculates the time difference (offset) of each slave from the master and adds it up.
         long sumOffsets = 0;
         for (long time : slaveTimes) {
             sumOffsets += (time - master.getTime());
@@ -76,3 +81,8 @@ public class BerkeleyAlgorithm {
         }
     }
 }
+
+/*
+1. Offset is the difference in time between a slave node’s clock and the master’s clock. (e.g 200ms)
+
+*/
