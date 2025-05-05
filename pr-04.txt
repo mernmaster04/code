@@ -5,17 +5,17 @@ public class BerkeleyAlgorithm {   // This is the main class that contains the B
 
 // Defines a Node (either master or slave), which has a clock time in milliseconds.
     static class Node {
-        long clockTime; // Time in milliseconds
+        long clockTime; // Variable store current Time of node (like master or slave) in milliseconds
 
         public Node(long time) {   // (constructor) Initializes the node's clock with a given time. 
             this.clockTime = time;
         }
 
-        public long getTime() {   // Returns the node's current clock time. 
+        public long getTime() {   //  Getter Method -> Returns the current clock time (in milliseconds) of the node. 
             return clockTime;
         }
 
-        public void setTime(long newTime) {  // Sets (updates) the node's clock time.
+        public void setTime(long newTime) {  //  Setter Method: -> Sets (updates) the node's clock time.
             this.clockTime = newTime;
         }
 
@@ -28,11 +28,12 @@ public class BerkeleyAlgorithm {   // This is the main class that contains the B
 
     public static void main(String[] args) {   // This is the entry point of the program.
         // Simulate current time
-        long baseTime = System.currentTimeMillis();  // Gets the current time in milliseconds from the system clock
+        long baseTime = System.currentTimeMillis();  // Gets the current time in milliseconds (1714904500000) from the system clock
 
         // Create nodes with some simulated drift
-        Node master = new Node(baseTime); // Creates the master node with the current time.
+        Node master = new Node(baseTime); // Creates the master node with the current time of system.
 
+        // Declares an array named slaves, which can hold multiple Node objects.
         Node[] slaves = {   // Creates 3 slave nodes with time drift:
                 new Node(baseTime - 200), // 200 ms behind from current time
                 new Node(baseTime + 100), // 100 ms min ahead
